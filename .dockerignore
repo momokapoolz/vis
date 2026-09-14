@@ -1,0 +1,7 @@
+.git
+.idea
+.agents
+~
+.env
+.cache
+*.exe

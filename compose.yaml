@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: wallet_migrator
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?copy .env.example to .env}
+      POSTGRES_DB: wallet
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?set APP_DB_PASSWORD}
+    ports: ["127.0.0.1:5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/10-app-role.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wallet_migrator -d wallet"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  migrate:
+    build: .
+    command: ["migrate"]
+    environment:
+      MIGRATION_DATABASE_URL: postgres://wallet_migrator:${POSTGRES_PASSWORD}@db:5432/wallet?sslmode=disable
+    depends_on:
+      db: {condition: service_healthy}
+  api:
+    build: .
+    ports: ["127.0.0.1:8080:8080"]
+    environment:
+      DATABASE_URL: postgres://wallet_app:${APP_DB_PASSWORD}@db:5432/wallet?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:?set WEBHOOK_SECRET}
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  test:
+    profiles: [tools]
+    build:
+      context: .
+      target: build
+    command: ["go", "test", "-count=1", "-v", "./..."]
+    environment:
+      TEST_DATABASE_URL: postgres://wallet_migrator:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable
+    depends_on:
+      db: {condition: service_healthy}
+  seed:
+    profiles: [tools]
+    build: .
+    command: ["seed"]
+    environment:
+      DATABASE_URL: postgres://wallet_app:${APP_DB_PASSWORD}@db:5432/wallet?sslmode=disable
+      MIGRATION_DATABASE_URL: postgres://wallet_migrator:${POSTGRES_PASSWORD}@db:5432/wallet?sslmode=disable
+      SEED_EMAIL: ${SEED_EMAIL:-}
+      SEED_PASSWORD: ${SEED_PASSWORD:-}
+      SEED_ROLE: ${SEED_ROLE:-}
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+volumes:
+  pgdata:

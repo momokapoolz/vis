@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "golang-grpc": {
+      "source": "samber/cc-skills-golang",
+      "sourceType": "github",
+      "skillPath": "skills/golang-grpc/SKILL.md",
+      "computedHash": "27e966abf8372f0a6e33c0b024f71f54b0ebae4595b8b84606d40cd830b79f11"
+    }
+  }
+}
