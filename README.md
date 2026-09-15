@@ -3,6 +3,8 @@
 Backend Go + PostgreSQL mô phỏng ví điện tử VND, theo [đặc tả ban đầu](docs/setup.md).
 Không xử lý tiền thật. Số dư được tính từ ledger; mỗi giao dịch có một debit và một credit, commit cùng nhau.
 
+Tài liệu yêu cầu phần mềm: [docs/SRS.md](docs/SRS.md).
+
 ## Chạy bằng Docker trên Windows
 
 Cần Docker Desktop với Linux containers. Tại thư mục repo:
