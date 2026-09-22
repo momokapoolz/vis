@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?copy .env.example to .env}
       POSTGRES_DB: wallet
       APP_DB_PASSWORD: ${APP_DB_PASSWORD:?set APP_DB_PASSWORD}
-    ports: ["127.0.0.1:5432:5432"]
+    ports: ["127.0.0.1:5436:5432"]
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/10-app-role.sh:ro
