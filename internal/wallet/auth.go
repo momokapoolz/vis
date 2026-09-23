@@ -31,8 +31,8 @@ func normalizeCredentials(c *credentials) error {
 	if err != nil || address.Address != c.Email || len(c.Email) > 254 {
 		return invalid("A valid email is required")
 	}
-	if len(c.Password) < 8 || len(c.Password) > 72 {
-		return invalid("Password must be 8-72 bytes")
+	if len(c.Password) > 72 {
+		return invalid("Password must be at most 72 bytes")
 	}
 	return nil
 }
